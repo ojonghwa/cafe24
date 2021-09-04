@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block title %}
+  Thank you
+{% endblock %}
+
+{% block content %}
+<div class="container my-3">
+  <h5 class="border-bottom py-3">감사합니다.</h5>
+
+  <p>주문이 성공적으로 접수되었습니다. <br/>
+    주문번호: <strong>{{ order.id }}</strong>.
+  </p>
+</div>  
+{% endblock %}

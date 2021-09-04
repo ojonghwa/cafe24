@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block title %}신용카드 결재{% endblock %}
+
+{% block content %}
+<div class="container my-3">
+  <h4 class="border-bottom py-3">신용카드 결재 [테스트]</h4>
+  
+  <!-- 신용카드 번호 입력시 검사기능 -->
+  <form id="payment" method="post">
+    <label for="card-number">Card Number [4111 1111 1111 1111]</label>
+    <div id="card-number" class="field"></div>
+
+    <label for="cvv">CVV [123]</label>
+    <div id="cvv" class="field"></div>
+
+    <label for="expiration-date">Expiration Date [12/28]</label>
+    <div id="expiration-date" class="field"></div>
+
+    <input type="hidden" id="nonce" name="payment_method_nonce" value="">
+    {% csrf_token %}
+    <input type="submit" value="결재">
+  </form>
+</div>
+
+
+<!-- includes the Braintree JS client SDK -->
+<script src="https://js.braintreegateway.com/web/3.58.0/js/client.min.js"></script>
+<script src="https://js.braintreegateway.com/web/3.58.0/js/hosted-fields.min.js"></script>
+<script>
+  var form = document.querySelector('#payment');
+  var submit = document.querySelector('input[type="submit"]');
+
+  braintree.client.create({
+      authorization: '{{ client_token }}'
+    }, 
+    function (clientErr, clientInstance) {
+      if (clientErr) {
+        console.error(clientErr);
+        return;
+      }
+
+      braintree.hostedFields.create({
+        client: clientInstance,
+        styles: {
+          'input': {'font-size': '14px'},
+          'input.invalid': {'color': 'red'},
+          'input.valid': {'color': 'green'}
+        },
+        fields: {
+          number: {selector: '#card-number'},
+          cvv: {selector: '#cvv'},
+          expirationDate: {selector: '#expiration-date'}
+        }
+      }, 
+      function (hostedFieldsErr, hostedFieldsInstance) {
+        if (hostedFieldsErr) {
+          console.error(hostedFieldsErr);
+          return;
+        }
+
+        submit.removeAttribute('disabled');
+
+        form.addEventListener('submit', function (event) {
+          event.preventDefault();
+
+          hostedFieldsInstance.tokenize(function (tokenizeErr, payload) {
+            if (tokenizeErr) {
+              console.error(tokenizeErr);
+              return;
+            }
+            // set nonce to send to the server
+            document.getElementById('nonce').value = payload.nonce;
+            // submit form
+            document.getElementById('payment').submit();
+          });
+        }, false);
+      });
+    }
+  );
+</script>
+{% endblock %}

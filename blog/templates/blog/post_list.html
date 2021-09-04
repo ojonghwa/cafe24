@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load common_filter %}
+{% load humanize %}
+
+
+{% block content %}
+
+<div class="container my-3">
+    <h5 class="border-bottom py-3">{% if kw %}'{{ kw }}' 검색결과{% endif %}</h5>
+
+    <div class="product-list">
+        {% for product in products %}
+          <div class="item">
+            <a href="{{ product.get_absolute_url }}">
+              <img src="{% if product.image %}
+                  {{ product.image.url }}
+                {% else %}
+                  {% static 'img/no_image.png' %}
+                {% endif %}">
+            </a><br/>
+
+            <a href="{{ product.get_absolute_url }}">{{ product.name|truncatechars:30 }}</a><br>
+            {{ product.price|intcomma }}원
+          </div>
+        {% endfor %}
+    </div>
+
+
+    <div >
+        <select class="form-control so">
+            <option value="recent" {% if so == 'recent' %}selected{% endif %}>최신순</option>
+            <option value="recommend" {% if so == 'recommend' %}selected{% endif %}>추천순</option>
+        </select>
+    </div>
+
+    
+    <table class="table my-3">
+        <tbody>
+            {% if post_list %}
+                {% for post in post_list %}
+                    {% if post.status == 'published' %}
+                    <tr class="text-center">
+                        <td>{{ post_list.paginator.count|sub:post_list.start_index|sub:forloop.counter0|add:1 }}</td>
+
+                        <td class="text-left">
+                            <a href="{% url 'blog:detail' post.id %}">{{ post.title|truncatechars:35 }}</a>
+                            {% if post.comment_set.count > 0 %}
+                                <span class="text-danger small ml-2">{{ post.comment_set.count }}</span>
+                            {% endif %}
+                        </td>
+
+                        <td>{{ post.author.username }}</td>
+                        <td>{{ post.updated| date:'Y-m-d H:i' }}</td>
+                    </tr>
+                    {% endif %}
+                {%  endfor %}
+            {% else %}
+                <tr>
+                    <td colspan="4">등록된 글이 없습니다.</td>
+                </tr>
+            {% endif %}
+        </tbody>
+    </table>
+
+    {% include "paginator2.html" %}
+   
+</div>
+{% endblock %}

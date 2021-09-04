@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% load static %}
+{% load common_filter %}
+
+{% block title %}Profile{% endblock %}
+
+{% block content %}
+<div class="container my-3">
+    <h5 class="border-bottom py-3">회원 페이지</h5>
+
+    <div class="col-12 text-right">
+        <span><a href="{% url 'shop:customer_profile_create' %}">배송주소 관리</a> 또는 
+            <a href="{% url 'shop:customer_ordered_list' %}">구매목록</a>
+        </span>
+    </div><br/>
+
+
+    <h6>내가 작성한 글들</h6>
+
+    <table class="table">
+        <tbody>
+            {% if post_list %}
+                {% for post in post_list %}
+                    <tr>
+                        <td>{{ post_list.paginator.count|sub:post_list.start_index|sub:forloop.counter0|add:1 }}</td>
+                        <td>
+                            <a href="{% url 'blog:detail' post.id %}">{{ post.title }}</a>
+                            {% if post.comment_set.count > 0 %}
+                                <span class="text-danger small ml-2">{{ post.comment_set.count }}</span>
+                            {% endif %}
+
+                            {% if post.status == 'draft' %}
+                                <span class="text-danger small ml-2">비공개</span>
+                            {% endif %}
+
+                        </td>
+                        <td>{{ post.updated| date:'Y-m-d H:i' }}</td>
+                    </tr>
+                    <tr>
+                        <td>&nbsp</td>
+                        <td colspan="2">{{ post.body|truncatewords:35 }}</td>
+                    </tr>
+                {% endfor %}
+            {% else %}
+                <tr>
+                    <td colspan="3">아직 등록된 글이 없습니다.</td>
+                </tr>
+            {% endif %}
+        </tbody>
+    </table>
+
+    {% include "paginator.html" %}
+
+</div>
+{% endblock %}

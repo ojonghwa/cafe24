@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container my-3">
+    <h4 class="border-bottom py-2">글 등록</h4>
+
+    <form method="post" class="my-3">
+        {% csrf_token %}
+
+        {% include "form_errors.html" %}
+
+        <div class="form-group">
+            <label for="title">제목</label>
+            <input type="text" name="title" id="title" class="form-control" 
+                value="{{ form.title.value|default_if_none:'' }}">
+            
+            <label for="body" class="my-3">내용</label>
+            <textarea name="body" id="body" {% if not user.is_authenticated %}disabled{% endif %}
+                rows="7" class="form-control">{{ form.body.value|default_if_none:'' }}</textarea>
+            
+            <label for="product" class="my-3">제품:</label>
+            <select class="form-control" name="product" id="product"> 
+                <option class="form-control" value="{{ product.id }}" selected>
+                {{ product.name }}</option>
+            </select>
+     
+            <label for="status" class="my-3">공개 여부:</label>
+            <select name="status" class="form-control" id="status">
+                <option value="draft">비공개</option>
+                <option value="published" selected>공개</option>
+            </select>
+         
+        </div>
+        <input type="submit" value="저장" class="btn btn-primary btn-sm">
+    </form>
+
+</div>
+{% endblock %}

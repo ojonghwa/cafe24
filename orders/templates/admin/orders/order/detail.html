@@ -1,0 +1,88 @@
+{% extends "admin/base_site.html" %}
+{% load humanize %}
+
+{% block title %}
+  Order {{ order.id }} {{ block.super }}
+{% endblock %}
+
+{% block breadcrumbs %}
+  <div class="breadcrumbs">
+    <a href="{% url 'admin:index' %}">Home</a> &rsaquo;
+    <a href="{% url 'admin:orders_order_changelist' %}">Orders</a>
+    &rsaquo;
+    <a href="{% url 'admin:orders_order_change' order.id %}">Order {{ order.id }}</a>
+    &rsaquo; Detail
+  </div>
+{% endblock %}
+
+{% block content %}
+<h1>주문번호 {{ order.id }}</h1> <br/>
+
+<ul class="object-tools">
+  <li>
+    <a href="#" onclick="window.print();">주문 인쇄</a>
+  </li>
+</ul>
+
+<table>
+  <tr>
+    <th>주문일</th>   <td>{{ order.created }}</td>
+  </tr>
+  <tr>
+    <th>고객</th>     <td>{{ order.fullname }}</td>
+  </tr>
+  <tr>
+    <th>E-mail</th>   <td><a href="mailto:{{ order.email }}">{{ order.email }}</a></td>
+  </tr>
+  <tr>
+    <th>주소</th>     <td>{{ order.postal_code }}, {{ order.address }}</td>
+  </tr>
+  <tr>
+    <th>결재금액</th> <td>{{ order.get_total_cost|floatformat:0|intcomma }}원</td>
+  </tr>
+  <tr>
+    <th>결재상태</th> <td>{% if order.paid %}결재완료{% else %}미결재{% endif %}</td>
+  </tr>
+</table> <br/>
+
+<div class="module">
+  <h3>주문내역</h3>
+
+  <table style="width:100%">
+    <tr>
+      <th width="60%" style="text-align: center;">제품</th>
+      <th style="text-align: right;">단가</th>
+      <th style="text-align: right;">수량</th>
+      <th style="text-align: right;">합계</th>
+    </tr>
+
+    {% for item in order.items.all %}
+      <tr class="row{% cycle '1' '2' %}">
+        <td>{{ item.product.name }}</td>
+        <td style="text-align: right;">{{ item.price|intcomma }}원</td>
+        <td style="text-align: right;">{{ item.quantity }}</td>
+        <td style="text-align: right;">{{ item.get_cost|intcomma }}원</td>
+      </tr>
+      
+      {% if forloop.last %}
+          {% if order.discount > 0 %}
+            <tr class="row{{ forloop.counter }}" style="font-weight: bold;">
+              <td style="text-align: right;">총 합계</td>
+              <td></td>
+              <td colspan="2" style="text-align: right;">
+                {{ order.get_original_total_cost|floatformat:0|intcomma }}원</td>
+            </tr>
+          {% endif %}
+        {% endif %}
+
+    {% endfor %}
+
+    <tr style="font-weight: bold;">
+      <td style="text-align: right;">최종 결재금액 {% if order.discount > 0 %} [쿠폰 {{ order.discount }}% 할인] {% endif %}</td>
+      <td></td>
+      <td colspan="2" style="text-align: right;">{{ order.get_total_cost|floatformat:0|intcomma }}원</td>
+    </tr>
+
+  </table>
+</div>
+{% endblock %}

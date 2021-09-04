@@ -1,0 +1,152 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.min.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/base.css' %}?v2">
+
+    <link rel="shortcut icon" type="image/x-icon" href="{% static 'favicon.ico' %}">
+    <title>{% block title %}My shop{% endblock %}</title>
+</head>
+
+<body>
+    <!-- 네비게이션바 -->
+    <div class="container">
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <a class="navbar-brand" href="{% url 'index' %}">Book Cafe</a>
+
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+        
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+
+                <!-- 추후 메뉴 추가 
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link navi-menu" href="#">메뉴1</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle navi-menu" href="#" data-toggle="dropdown">메뉴2</a>
+                        <div class="dropdown-menu">
+                            <a class="dropdown-item navi-menu" href="#">아이템1</a>
+                            <a class="dropdown-item navi-menu" href="#">아이템2</a>
+                            <a class="dropdown-item navi-menu" href="#">아이템3</a>
+                        </div>
+                    </li>
+                </ul>
+                -->
+
+                <ul class="navbar-nav ml-auto ">
+
+                    {% with total_items=cart|length %}
+                        <li class="nav-item">
+                            <a class="nav-link navi-menu" href="{% url 'cart:cart_detail' %}">장바구니[{{ total_items }}]</a>
+                        </li>
+                    {% endwith %}
+
+                    {% if user.is_authenticated %}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle navi-menu" href="#" data-toggle="dropdown">{{ user.username }}</a>
+
+                            <div class="dropdown-menu">
+                                <a class="dropdown-item navi-menu" href="{% url 'shop:customer_profile' %}">프로필</a>    
+                                <a class="dropdown-item navi-menu" href="{% url 'common:password_change' %}">비밀번호 변경</a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item navi-menu" href="{% url 'common:logout' %}">로그아웃</a>
+                            </div>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link navi-menu" href="{% url 'common:login' %}">로그인</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link navi-menu" href="{% url 'common:signup' %}">회원가입</a>
+                        </li>
+                    {% endif %}
+                </ul>
+
+                <div class="form-inline">
+                    <input class="kw form-control mr-sm-2" type="text" placeholder="Search" aria-label="Search" value="">
+                    <button class="btn btn-outline-success my-2" type="submit" id="btn_search">검색</button>
+                </div>
+            </div>
+        </nav>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="row" style="margin:20px auto;">
+                    <div class="col-sm-12">
+                        <div class="alert alert-danger">
+                            <strong>{{ message.tags }}!</strong> {{ message.message }}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+    
+
+    {% block content %}
+    {% endblock %}
+
+    <form id="searchForm" method="get" action="{% url 'blog:index' %}">
+        <input type="hidden" id="kw" name="kw" value="{{ kw|default_if_none:'' }}">
+        <input type="hidden" id="page" name="page" value="{{ page }}">
+        <input type="hidden" id="so" name="so" value="{{ so }}">
+    </form>
+
+    <script src="{% static 'js/jquery-3.6.0.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap.min.js' %}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@2.2.1/src/js.cookie.min.js"></script>
+    <script>
+        var csrftoken = Cookies.get('csrftoken');
+        function csrfSafeMethod(method) {
+            // these HTTP methods do not require CSRF protection
+            return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+        }
+        $.ajaxSetup({
+            beforeSend: function(xhr, settings) {
+                if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                }
+            }
+        });
+
+        $(document).ready(function() {
+            {% block domready %}
+
+            {% endblock %}
+        });
+    </script>
+
+    <script type='text/javascript'>
+        $(document).ready(function() {
+            $(".page-link").on('click', function() {
+                $("#page").val($(this).data("page"));
+                $("#searchForm").submit();
+            });
+
+            $("#btn_search").on('click', function() {
+                $("#kw").val($(".kw").val());
+                $("#page").val(1);      // 검색버튼을 클릭할 경우 1페이지부터 조회
+                $("#searchForm").submit();
+            });
+
+            $(".so").on('change', function() {  // 정렬기준
+                $("#so").val($(this).val());
+                $("#page").val(1);
+                $("#searchForm").submit();
+            });
+        });
+    </script>
+
+
+    {% block script %}
+    {% endblock %}
+
+</body>
+</html>
