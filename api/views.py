@@ -16,10 +16,36 @@ from django.contrib.auth.models import User
 from .serializers import ProductSerializer, CategorySerializer, CategoryProductSerializer, \
     OrderSerializer, OrderItemSerializer, PostSerializer, UserSerializer
 from django.db.models import Q
-import sys
+import sys, requests
 
 #from rest_framework.decorators import api_view
 from iot.models import Esp8266
+
+
+#curl -X GET http://127.0.0.1:8000/api/getDustData/ -H "Authorization:Token f9e94d2e37aa1a0f2dbc255c0d1b8efa564a1cad"
+
+class getDustData(APIView):
+    authentication_classes = [TokenAuthentication, BasicAuthentication]
+    permission_classes = [IsAdminUser]
+
+    def get(self, request, format=None):
+
+        KoreaApiKey2 = "V7gnr5NtRL3R7HGoKR7Ry2J4cEptcZeGEu69y%2BTZ%2BGON4xh7pqYJTSELRGiHHsly95JbVj1M7G7tUyo6a%2BvVpw%3D%3D"
+        stationName  = "수지"
+        servername   = "http://apis.data.go.kr/B552584/ArpltnInforInqireSvc/getMsrstnAcctoRltmMesureDnsty?numOfRows=1&dataTerm=DAILY&ver=1.3&serviceKey=" + KoreaApiKey2 + "&stationName=" + stationName
+
+        xmlString = requests.get(servername)
+        #print(xmlString.text)
+
+        start = xmlString.text.find("<pm25Value>")
+        end   = xmlString.text.find("</pm25Value>")
+
+        pm25Value = xmlString.text[start+11:end]
+        pm25Value = int(pm25Value)
+
+        content = { 'pm25Value': pm25Value }
+        return Response(content)
+
 
 
 '''

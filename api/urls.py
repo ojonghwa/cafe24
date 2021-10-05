@@ -30,5 +30,6 @@ urlpatterns = [
     path('orderlist/<username>/', views.OrderListDetailView.as_view(), name='order_list'),
 
     path('iot/', views.iot_esp8266View.as_view()),
+    path('getDustData/', views.getDustData.as_view()),
 ]
 
