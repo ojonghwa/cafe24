@@ -25,8 +25,8 @@ from iot.models import Esp8266
 #curl -X GET http://127.0.0.1:8000/api/getDustData/ -H "Authorization:Token f9e94d2e37aa1a0f2dbc255c0d1b8efa564a1cad"
 
 class getDustData(APIView):
-    authentication_classes = [TokenAuthentication, BasicAuthentication]
-    permission_classes = [IsAdminUser]
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request, format=None):
 
