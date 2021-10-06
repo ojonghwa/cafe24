@@ -23,7 +23,7 @@ from cafe24.settings import KoreaApiKey2
 from iot.models import Esp8266
 
 
-#curl -X GET http://127.0.0.1:8000/api/getDustData/ -H "Authorization:Token f9e94d2e37aa1a0f2dbc255c0d1b8efa564a1cad"
+#curl -X GET http://127.0.0.1:8000/api/getDustData/ -H "Authorization:Token f9ecad"
 
 class getDustData(APIView):
     authentication_classes = [TokenAuthentication]
@@ -69,7 +69,7 @@ def iot_esp8266(request, username):
     return Response(content, status=HTTP_200_OK)
 '''
 
-#curl -X POST http://127.0.0.1:8000/api/iot/ -H "Authorization:Token f9e94d2e37aa1a0f2dbc255c0d1b8efa564a1cad" -d "espid=h01r01#001&temp=24.0&humi=53.5"
+#curl -X POST http://127.0.0.1:8000/api/iot/ -H "Authorization:Token f9ecad" -d "espid=h01r01#001&temp=24.0&humi=53.5"
 
 class iot_esp8266View(APIView):
     authentication_classes = [TokenAuthentication]
