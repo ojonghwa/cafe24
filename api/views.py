@@ -17,23 +17,25 @@ from .serializers import ProductSerializer, CategorySerializer, CategoryProductS
     OrderSerializer, OrderItemSerializer, PostSerializer, UserSerializer
 from django.db.models import Q
 import sys, requests
+from cafe24.settings import KoreaApiKey2
 
 #from rest_framework.decorators import api_view
 from iot.models import Esp8266
 
 
-#curl -X GET http://127.0.0.1:8000/api/getDustData/ -H "Authorization:Token f9e94d2e37aa1a0f2dbc255c0d1b8efa564a1cad"
+#curl -X GET http://127.0.0.1:8000/api/getDustData/ -H "Authorization:Token *"
 
 class getDustData(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
 
     def get(self, request, format=None):
+        
+        stationName  = "종로"
+        #1일 100번까지 가능하므로 20분 간격으로 call 하도록 수정하고, 결과값을 변수에 담아두고 그 사이 호출 발생시 변수값을 반환 
 
-        KoreaApiKey2 = "V7gnr5NtRL3R7HGoKR7Ry2J4cEptcZeGEu69y%2BTZ%2BGON4xh7pqYJTSELRGiHHsly95JbVj1M7G7tUyo6a%2BvVpw%3D%3D"
-        stationName  = "수지"
         servername   = "http://apis.data.go.kr/B552584/ArpltnInforInqireSvc/getMsrstnAcctoRltmMesureDnsty?numOfRows=1&dataTerm=DAILY&ver=1.3&serviceKey=" + KoreaApiKey2 + "&stationName=" + stationName
-
+  
         xmlString = requests.get(servername)
         #print(xmlString.text)
 
@@ -66,7 +68,7 @@ def iot_esp8266(request, username):
     return Response(content, status=HTTP_200_OK)
 '''
 
-#curl -X POST http://127.0.0.1:8000/api/iot/ -H "Authorization:Token f9e94d2e37aa1a0f2dbc255c0d1b8efa564a1cad" -d "espid=h01r01#001&temp=24.0&humi=53.5"
+#curl -X POST http://127.0.0.1:8000/api/iot/ -H "Authorization:Token *" -d "espid=h01r01#001&temp=24.0&humi=53.5"
 
 class iot_esp8266View(APIView):
     authentication_classes = [TokenAuthentication]
@@ -183,7 +185,7 @@ class Login(APIView):
         return Response({'token': token.key}, status=HTTP_200_OK)
 
 
-#curl -X GET http://www.khubeauty.shop/api/order/ -H "Authorization:Token f9e94"
+#curl -X GET http://www.khubeauty.shop/api/order/ -H "Authorization:Token *"
 #[{"id":1,"username":"admin","email":"ojonghwa@gmail.com"},{"id":2,"username":"ojonghwa","email":"ojonghwa@naver.com"},{"id":3,"username":"empas","email":"ojonghwa@empas.com"}]
 
 #curl -X GET -u admin:ze http://127.0.0.1:8000/api/orderlist/
