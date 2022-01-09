@@ -17,10 +17,12 @@ from .serializers import ProductSerializer, CategorySerializer, CategoryProductS
     OrderSerializer, OrderItemSerializer, PostSerializer, UserSerializer
 from django.db.models import Q
 import sys, requests
-from cafe24.settings import KoreaApiKey2
+from cafe24.settings import KoreaApiKey2, CoronaApiKey
 
 #from rest_framework.decorators import api_view
 from iot.models import Esp8266
+from xml.etree import ElementTree
+from datetime import datetime, timedelta
 
 
 #curl -X GET http://127.0.0.1:8000/api/getDustData/ -H "Authorization:Token *"
@@ -48,6 +50,82 @@ class getDustData(APIView):
         content = { 'pm25Value': pm25Value }
         return Response(content)
 
+
+
+''' 날짜 계산 
+from datetime import datetime, timedelta
+now = datetime.now()
+print("현재 :" , now)			    # 현재 : 2021-01-09 19:41:03.645702
+before_one_day = now - timedelta(days=1)
+print("1일 전 :", before_one_day)	# 1일 전 : 2021-01-08 19:41:03.645702
+result = now.strftime("%Y%m%d")
+print(result)			            # 20220109
+'''
+
+class getCoronaData(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, format=None):
+        now = datetime.now()
+        before_four_day = now - timedelta(days=4)
+
+        endCreateDt = now.strftime("%Y%m%d")
+        startCreateDt = before_four_day.strftime("%Y%m%d")
+
+        servername = "http://openapi.data.go.kr/openapi/service/rest/Covid19/getCovid19InfStateJson?serviceKey=" + CoronaApiKey + "&startCreateDt=" + str(startCreateDt) + "&endCreateDt=" + str(endCreateDt)
+        
+        print(servername, file=sys.stdout)
+
+        xmlString = requests.get(servername)
+        #print(xmlString.text, file=sys.stdout)
+
+        start = xmlString.text.find("<body>")
+        end   = xmlString.text.find("<numOfRows>")
+
+        body = xmlString.text[start+6:end]
+        print(body, file=sys.stdout)
+
+        root_element = ElementTree.fromstring(body)
+
+        items = []
+        iter_element = root_element.iter(tag="item")
+        for element in iter_element:
+            corona = {}
+            corona['decideCnt'] = element.find("decideCnt").text
+            corona['accExamCnt'] = element.find("accExamCnt").text
+            items.append(corona)   
+
+        #print(items)
+        #[{'decideCnt': '664391', 'accExamCnt': '20099870'}, {'decideCnt': '657505', 'accExamCnt': '19971712'}]
+        #print(items[0]['accExamCnt'])   #20099870
+        #print(items[1]['accExamCnt'])   #19971712
+
+        decideCntValue = int(items[0]['decideCnt'])  - int(items[1]['decideCnt'])
+        NewAccExamCnt  = int(items[0]['accExamCnt']) - int(items[1]['accExamCnt'])
+
+        content = { 'NewDecideCnt': decideCntValue, 'NewAccExamCnt': NewAccExamCnt }
+        return Response(content)    #{"NewDecideCnt":6886,"NewAccExamCnt":128158}
+
+'''
+from xml.etree import ElementTree
+str_xml =   <animals>
+                <animal><name>lion</name><lifespan>13</lifespan></animal>
+                <animal><name>tiger</name><lifespan>17</lifespan></animal>
+            </animals>
+
+root_element = ElementTree.fromstring(str_xml)      # 문자열에서 XML을 파싱합니다
+animals = []                                        # 동물리스트를 저장할 list 초기화한다
+iter_element = root_element.iter(tag="animal")      # animal태그 iterator를 가져옵니다
+for element in iter_element:                        # animal태그를 순회합니다
+    animal = {}                                     # 각 동물을 저장할 dict 초기화한다
+    animal['name'] = element.find("name").text      # name태그 값을 저장합니다
+    animal['lifespan'] = element.find("lifespan").text  # lefespan태그 값을 저장합니다
+    animals.append(animal)                          # 동물리스트에 동물정보를 저장합니다
+
+print(animals)
+#[{'name': 'lion', 'lifespan': '13'}, {'name': 'tiger', 'lifespan': '17'}]
+'''
 
 
 '''

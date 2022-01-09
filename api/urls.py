@@ -31,5 +31,6 @@ urlpatterns = [
 
     path('iot/', views.iot_esp8266View.as_view()),
     path('getDustData/', views.getDustData.as_view()),
+    path('getCoronaData/', views.getCoronaData.as_view()),
 ]
 
