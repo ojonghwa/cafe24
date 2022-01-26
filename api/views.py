@@ -42,13 +42,15 @@ class getDustData(APIView):
         if( content == {} ) :  # 1일 100번까지 호출 가능하므로 서버 실행 후 최초 실행되거나 30분이 안된 경우라면 
             print("content None, request API")
             content = self.callOpenAPI()
-            setattr(self, 'content', content)
+            if( content != {} ) :
+                setattr(self, 'content', content)
             return Response(content)
 
         elif (now > (content['dataTime'] + relativedelta(minutes=30))):
             print("content updates before 3, request API for new")
             content = self.callOpenAPI()
-            setattr(self, 'content', content)
+            if( content != {} ) :
+                setattr(self, 'content', content)
             return Response(content) 
 
         else:
@@ -96,6 +98,10 @@ class getDustData(APIView):
         pm10Grade = int(items[0]['pm10Grade'])
         o3Grade   = int(items[0]['o3Grade'])
 
+        if((int(items[0]['pm25Value'])) == 0):
+            content = { }
+            return content
+
         content = { 'pm25Value': pm25Value, 'pm10Value': pm10Value, 'o3Value': o3Value, 
                     'pm25Grade': pm25Grade, 'pm10Grade': pm10Grade, 'o3Grade': o3Grade, 'dataTime': accessApiTime }
         return content
@@ -127,16 +133,18 @@ class getCoronaData(APIView):
         content = getattr(self, 'content')
         print(content)
 
-        if( content == {} ) :  # 서버 실행 후 최초 실행되거나 30분이 안된 경우라면 
+        if( content == {} ) :   # 서버 실행 후 최초 실행되거나 30분이 안된 경우라면 
             print("content None, request API")
             content = self.callOpenAPI()
-            setattr(self, 'content', content)
+            if( content != {} ) :
+                setattr(self, 'content', content)
             return Response(content)
 
         elif (now > (content['dataTime'] + relativedelta(minutes=30))):
             print("content updates before 3, request API for new")
             content = self.callOpenAPI()
-            setattr(self, 'content', content)
+            if( content != {} ) :
+                setattr(self, 'content', content)
             return Response(content) 
 
         else:
@@ -187,6 +195,10 @@ class getCoronaData(APIView):
         decideCntValue = int(items[0]['decideCnt'])  - int(items[1]['decideCnt'])
         NewAccExamCnt  = int(items[0]['accExamCnt']) - int(items[1]['accExamCnt'])
         NewDeathCnt  = int(items[0]['deathCnt']) - int(items[1]['deathCnt'])
+
+        if((int(items[0]['decideCnt']) == 0) or (int(items[0]['accExamCnt']))):
+            content = { }
+            return content
 
         #신규 확진자, 검사자, 사망자 수, API 요청시간
         content = { 'NewDecideCnt': decideCntValue, 'NewAccExamCnt': NewAccExamCnt, 'NewDeathCnt': NewDeathCnt, 
