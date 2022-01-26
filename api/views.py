@@ -23,6 +23,7 @@ from cafe24.settings import KoreaApiKey2, CoronaApiKey
 from iot.models import Esp8266
 from xml.etree import ElementTree
 from datetime import datetime, timedelta
+from dateutil.relativedelta import relativedelta
 
 
 #curl -X GET http://127.0.0.1:8000/api/getDustData/ -H "Authorization:Token *"
@@ -30,25 +31,82 @@ from datetime import datetime, timedelta
 class getDustData(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
+    content = {}
 
     def get(self, request, format=None):
-        
-        stationName  = "종로"
-        #1일 100번까지 가능하므로 20분 간격으로 call 하도록 수정하고, 결과값을 변수에 담아두고 그 사이 호출 발생시 변수값을 반환 
+        now = datetime.now()
 
+        content = getattr(self, 'content')
+        print(content)
+
+        if( content == {} ) :  # 1일 100번까지 호출 가능하므로 서버 실행 후 최초 실행되거나 30분이 안된 경우라면 
+            print("content None, request API")
+            content = self.callOpenAPI()
+            if( content != {} ) :
+                setattr(self, 'content', content)
+            return Response(content)
+
+        elif (now > (content['dataTime'] + relativedelta(minutes=30))):
+            print("content updates before 3, request API for new")
+            content = self.callOpenAPI()
+            if( content != {} ) :
+                setattr(self, 'content', content)
+            return Response(content) 
+
+        else:
+            print("now new content, don't update content dataTime")
+            return Response(content) 
+
+            #{"pm25Value":36,"pm10Value":63,"o3Value":0.028,"pm25Grade":3,"pm10Grade":2,"o3Grade":1,"dataTime":"2022-01-26T18:09:33.451768"}
+
+
+    def callOpenAPI(self):
+        now = datetime.now()
+        accessApiTime = now - timedelta(days=4)
+        stationName  = "종로"
         servername   = "http://apis.data.go.kr/B552584/ArpltnInforInqireSvc/getMsrstnAcctoRltmMesureDnsty?numOfRows=1&dataTerm=DAILY&ver=1.3&serviceKey=" + KoreaApiKey2 + "&stationName=" + stationName
   
         xmlString = requests.get(servername)
         #print(xmlString.text)
 
-        start = xmlString.text.find("<pm25Value>")
-        end   = xmlString.text.find("</pm25Value>")
+        accessApiTime = now
 
-        pm25Value = xmlString.text[start+11:end]
-        pm25Value = int(pm25Value)
+        start = xmlString.text.find("<body>")
+        end   = xmlString.text.find("<numOfRows>")
 
-        content = { 'pm25Value': pm25Value }
-        return Response(content)
+        body = xmlString.text[start+6:end]
+        #print(body, file=sys.stdout)
+
+        root_element = ElementTree.fromstring(body)
+
+        items = []
+        iter_element = root_element.iter(tag="item")
+        for element in iter_element:
+            result = {}
+            result['o3Value'] = element.find("o3Value").text
+            result['pm10Value'] = element.find("pm10Value").text
+            result['pm25Value'] = element.find("pm25Value").text
+            result['o3Grade'] = element.find("o3Grade").text
+            result['pm10Grade'] = element.find("pm10Grade").text
+            result['pm25Grade'] = element.find("pm25Grade").text
+            items.append(result)
+
+        pm25Value = int(items[0]['pm25Value'])
+        pm10Value = int(items[0]['pm10Value'])
+        o3Value   = float(items[0]['o3Value'])
+        pm25Grade = int(items[0]['pm25Grade'])
+        pm10Grade = int(items[0]['pm10Grade'])
+        o3Grade   = int(items[0]['o3Grade'])
+
+        if((int(items[0]['pm25Value'])) == 0):
+            content = { }
+            return content
+
+        content = { 'pm25Value': pm25Value, 'pm10Value': pm10Value, 'o3Value': o3Value, 
+                    'pm25Grade': pm25Grade, 'pm10Grade': pm10Grade, 'o3Grade': o3Grade, 'dataTime': accessApiTime }
+        return content
+
+        #{"pm25Value":39,"dataTime":"2022-01-26T15:02:11.351947"}
 
 
 
@@ -65,8 +123,38 @@ print(result)			            # 20220109
 class getCoronaData(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
+    content = { }
+
+    #매일 오전10시에 callOpenAPI() 자동 실행하도록 
 
     def get(self, request, format=None):
+        now = datetime.now()
+
+        content = getattr(self, 'content')
+        print(content)
+
+        if( content == {} ) :   # 서버 실행 후 최초 실행되거나 30분이 안된 경우라면 
+            print("content None, request API")
+            content = self.callOpenAPI()
+            if( content != {} ) :
+                setattr(self, 'content', content)
+            return Response(content)
+
+        elif (now > (content['dataTime'] + relativedelta(minutes=30))):
+            print("content updates before 3, request API for new")
+            content = self.callOpenAPI()
+            if( content != {} ) :
+                setattr(self, 'content', content)
+            return Response(content) 
+
+        else:
+            print("now new content, don't update content dataTime")
+            return Response(content) 
+
+            #{"NewDecideCnt":13012,"NewAccExamCnt":84293,"NewDeathCnt":32,"dataTime":"2022-01-26T16:54:20.123305"}
+
+
+    def callOpenAPI(self):
         now = datetime.now()
         before_four_day = now - timedelta(days=4)
 
@@ -80,11 +168,13 @@ class getCoronaData(APIView):
         xmlString = requests.get(servername)
         #print(xmlString.text, file=sys.stdout)
 
+        accessApiTime = now
+
         start = xmlString.text.find("<body>")
         end   = xmlString.text.find("<numOfRows>")
 
         body = xmlString.text[start+6:end]
-        print(body, file=sys.stdout)
+        #print(body, file=sys.stdout)
 
         root_element = ElementTree.fromstring(body)
 
@@ -94,7 +184,8 @@ class getCoronaData(APIView):
             corona = {}
             corona['decideCnt'] = element.find("decideCnt").text
             corona['accExamCnt'] = element.find("accExamCnt").text
-            items.append(corona)   
+            corona['deathCnt'] = element.find("deathCnt").text
+            items.append(corona)
 
         #print(items)
         #[{'decideCnt': '664391', 'accExamCnt': '20099870'}, {'decideCnt': '657505', 'accExamCnt': '19971712'}]
@@ -103,9 +194,17 @@ class getCoronaData(APIView):
 
         decideCntValue = int(items[0]['decideCnt'])  - int(items[1]['decideCnt'])
         NewAccExamCnt  = int(items[0]['accExamCnt']) - int(items[1]['accExamCnt'])
+        NewDeathCnt  = int(items[0]['deathCnt']) - int(items[1]['deathCnt'])
 
-        content = { 'NewDecideCnt': decideCntValue, 'NewAccExamCnt': NewAccExamCnt }
-        return Response(content)    #{"NewDecideCnt":6886,"NewAccExamCnt":128158}
+        if((int(items[0]['decideCnt']) == 0) or (int(items[0]['accExamCnt']))):
+            content = { }
+            return content
+
+        #신규 확진자, 검사자, 사망자 수, API 요청시간
+        content = { 'NewDecideCnt': decideCntValue, 'NewAccExamCnt': NewAccExamCnt, 'NewDeathCnt': NewDeathCnt, 
+            'dataTime': accessApiTime }
+        return content
+        
 
 '''
 from xml.etree import ElementTree
