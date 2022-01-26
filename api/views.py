@@ -196,7 +196,7 @@ class getCoronaData(APIView):
         NewAccExamCnt  = int(items[0]['accExamCnt']) - int(items[1]['accExamCnt'])
         NewDeathCnt  = int(items[0]['deathCnt']) - int(items[1]['deathCnt'])
 
-        if((int(items[0]['decideCnt']) == 0) or (int(items[0]['accExamCnt']))):
+        if((int(items[0]['decideCnt']) == 0) or (int(items[0]['accExamCnt']) == 0)):
             content = { }
             return content
 
