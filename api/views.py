@@ -50,7 +50,7 @@ class getWeatherData(APIView):
 
         elif (now > (content['dataTime'] + relativedelta(minutes=30))):
             print("content updates before 3, request API for new")
-            content = self.callOpenAPI()
+            content = self.callOpenAPI(city)
             if( content != {} ) :
                 setattr(self, 'content', content)
             return Response(content) 
