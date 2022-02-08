@@ -26,6 +26,28 @@ from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 
 
+#curl -X GET http://127.0.0.1:8000/api/getWeatherData/Seoul/ -H "Authorization:Token *"
+
+class getWeatherData(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    content = {}
+
+    def get(self, request, city, format=None):
+        content = getattr(self, 'content')
+        print(content)
+
+        if( content == {} ) :
+            print("content None, request API")
+            content = {"weather":"Clear", "description":"clear sky", "name":city, "temp":"0.44", "humidity":"38", "pressure":"1029" }
+            return Response(content)
+
+        else:
+            print("now new content, don't update content dataTime")
+            return Response(content) 
+
+
+
 #curl -X GET http://127.0.0.1:8000/api/getDustData/ -H "Authorization:Token *"
 
 class getDustData(APIView):
