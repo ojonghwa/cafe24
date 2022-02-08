@@ -252,7 +252,6 @@ class getCoronaData(APIView):
         for element in iter_element:
             corona = {}
             corona['decideCnt'] = element.find("decideCnt").text
-            corona['accExamCnt'] = element.find("accExamCnt").text
             corona['deathCnt'] = element.find("deathCnt").text
             items.append(corona)
 
@@ -262,16 +261,14 @@ class getCoronaData(APIView):
         #print(items[1]['accExamCnt'])   #19971712
 
         decideCntValue = int(items[0]['decideCnt'])  - int(items[1]['decideCnt'])
-        NewAccExamCnt  = int(items[0]['accExamCnt']) - int(items[1]['accExamCnt'])
         NewDeathCnt  = int(items[0]['deathCnt']) - int(items[1]['deathCnt'])
 
-        if((int(items[0]['decideCnt']) == 0) or (int(items[0]['accExamCnt']) == 0)):
+        if((int(items[0]['decideCnt']) == 0)):
             content = { }
             return content
 
         #신규 확진자, 검사자, 사망자 수, API 요청시간
-        content = { 'NewDecideCnt': decideCntValue, 'NewAccExamCnt': NewAccExamCnt, 'NewDeathCnt': NewDeathCnt, 
-            'dataTime': accessApiTime }
+        content = { 'NewDecideCnt': decideCntValue, 'NewAccExamCnt': 0, 'NewDeathCnt': NewDeathCnt, 'dataTime': accessApiTime }
         return content
         
 
