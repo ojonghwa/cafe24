@@ -17,13 +17,14 @@ from .serializers import ProductSerializer, CategorySerializer, CategoryProductS
     OrderSerializer, OrderItemSerializer, PostSerializer, UserSerializer
 from django.db.models import Q
 import sys, requests
-from cafe24.settings import KoreaApiKey2, CoronaApiKey
+from cafe24.settings import KoreaApiKey2, CoronaApiKey, WeatherApiKey
 
 #from rest_framework.decorators import api_view
 from iot.models import Esp8266
 from xml.etree import ElementTree
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
+import json
 
 
 #curl -X GET http://127.0.0.1:8000/api/getWeatherData/Seoul/ -H "Authorization:Token *"
@@ -34,17 +35,63 @@ class getWeatherData(APIView):
     content = {}
 
     def get(self, request, city, format=None):
+        now = datetime.now()
+
         content = getattr(self, 'content')
         print(content)
 
         if( content == {} ) :
-            print("content None, request API")
-            content = {"weather":"Clear", "description":"clear sky", "name":city, "temp":"0.44", "humidity":"38", "pressure":"1029" }
+            print("None, request Weather API")
+            #content = {"weather":"Clear", "description":"clear sky", "name":city, "temp":"0.44", "humidity":"38", "pressure":"1029","dataTime":"2022-01-26T18:09:33.451768" }
+            content = self.callOpenAPI(city)
+            if( content != {} ) :
+                setattr(self, 'content', content)
             return Response(content)
+
+        elif (now > (content['dataTime'] + relativedelta(minutes=30))):
+            print("content updates before 3, request API for new")
+            content = self.callOpenAPI()
+            if( content != {} ) :
+                setattr(self, 'content', content)
+            return Response(content) 
 
         else:
             print("now new content, don't update content dataTime")
             return Response(content) 
+
+
+    def callOpenAPI(self, city):
+        now = datetime.now()
+        accessApiTime = now
+
+        servername   = "http://api.openweathermap.org/data/2.5/weather?q=" + city + "&units=metric&appid=" + WeatherApiKey
+  
+        jsonString = requests.get(servername).text
+        print(jsonString)
+
+        #{"coord":{"lon":126.9778,"lat":37.5683},"weather":[{"id":800,"main":"Clear","description":"clear sky","icon":"01n"}],
+        # "base":"stations","main":{"temp":-5.98,"feels_like":-8.65,"temp_min":-9.58,"temp_max":-3.31,"pressure":1028,"humidity":86},
+        # "visibility":10000,"wind":{"speed":1.54,"deg":30},"clouds":{"all":0},"dt":1644337321,
+        # "sys":{"type":1,"id":8105,"country":"KR","sunrise":1644359330,"sunset":1644397431},"timezone":32400,"id":1835848,"name":"Seoul","cod":200}
+
+        jsonObject = json.loads(jsonString)
+        jsonArray = jsonObject.get("weather")
+        for dictweather in jsonArray:
+            #{'id': 804, 'main': 'Clouds', 'description': 'overcast clouds', 'icon': '04n'}
+            weather = dictweather.get("main")
+            description = dictweather.get("description")
+
+        temp        = jsonObject.get("main").get("temp")
+        feels_like  = jsonObject.get("main").get("feels_like")
+        pressure    = jsonObject.get("main").get("pressure")
+        humidity    = jsonObject.get("main").get("humidity")
+
+        wind_speed  = jsonObject.get("wind").get("speed")
+        wind_deg    = jsonObject.get("wind").get("deg")
+
+        content = {'weather':weather, 'description':description, 'temp':temp, 'feels_like':feels_like, 'pressure':pressure, 'humidity':humidity, 
+            'wind_speed':wind_speed, 'wind_deg':wind_deg, 'dataTime': accessApiTime }
+        return content
 
 
 
@@ -62,21 +109,21 @@ class getDustData(APIView):
         print(content)
 
         if( content == {} ) :  # 1일 100번까지 호출 가능하므로 서버 실행 후 최초 실행되거나 30분이 안된 경우라면 
-            print("content None, request API")
+            print("content None, request Dust API")
             content = self.callOpenAPI()
             if( content != {} ) :
                 setattr(self, 'content', content)
             return Response(content)
 
         elif (now > (content['dataTime'] + relativedelta(minutes=30))):
-            print("content updates before 3, request API for new")
+            print("content updates before 3, request Dust API for new")
             content = self.callOpenAPI()
             if( content != {} ) :
                 setattr(self, 'content', content)
             return Response(content) 
 
         else:
-            print("now new content, don't update content dataTime")
+            print("now new dust content, don't update content dataTime")
             return Response(content) 
 
             #{"pm25Value":36,"pm10Value":63,"o3Value":0.028,"pm25Grade":3,"pm10Grade":2,"o3Grade":1,"dataTime":"2022-01-26T18:09:33.451768"}
@@ -156,21 +203,21 @@ class getCoronaData(APIView):
         print(content)
 
         if( content == {} ) :   # 서버 실행 후 최초 실행되거나 30분이 안된 경우라면 
-            print("content None, request API")
+            print("content None, request Corona API")
             content = self.callOpenAPI()
             if( content != {} ) :
                 setattr(self, 'content', content)
             return Response(content)
 
         elif (now > (content['dataTime'] + relativedelta(minutes=30))):
-            print("content updates before 3, request API for new")
+            print("content updates before 3, request Corona API for new")
             content = self.callOpenAPI()
             if( content != {} ) :
                 setattr(self, 'content', content)
             return Response(content) 
 
         else:
-            print("now new content, don't update content dataTime")
+            print("now new Corona content, don't update content dataTime")
             return Response(content) 
 
             #{"NewDecideCnt":13012,"NewAccExamCnt":84293,"NewDeathCnt":32,"dataTime":"2022-01-26T16:54:20.123305"}
