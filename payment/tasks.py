@@ -17,7 +17,7 @@ def payment_completed(order_id):
     message = '최근 구매하신 내역이 첨부되어 있으니 확인바랍니다.'
     email = EmailMessage(subject, message, 'ojonghwa@gmail.com', [order.email])
 
-    # generate PDF
+    # generate PDF, 라즈베리파이에서 사용 불가 
     html = render_to_string('orders/order/pdf.html', {'order': order})
     out = BytesIO()
     stylesheets=[weasyprint.CSS(str(settings.BASE_DIR) + '/static/css/pdf.css')]
