@@ -16,7 +16,7 @@
             <div class="d-flex justify-content-end">
                 <div class="badge badge-light p-2 text-left">
                     <div class="mb-2">{{ post.author.username }}</div>
-                    <div>{{ post.updated| date:'Y-m-d H:i' }}</div>
+                    <div>{{ post.updated| date:'Y.m.d H:i' }}</div>
                 </div>
             </div>
 
@@ -67,7 +67,7 @@
                     <a name="comment_{{ comment.id }}"></a>     <!-- 댓글 앵커 엘리먼트 추가 -->
                     <div class="comment py-1 text-muted">
                         <span style="white-space: pre-line;">{{ comment.content }}</span>
-                        <span class="badge badge-light p-2">- {{ comment.author }}, {{ comment.updated| date:'Y-m-d H:i' }}
+                        <span class="badge badge-light p-2">- {{ comment.author }}, {{ comment.updated| date:'Y.m.d H:i' }}
                         </span>
                         {% if request.user == comment.author %}
                             <a href="{% url 'blog:comment_modify' comment.id  %}" class="small">수정</a>,
