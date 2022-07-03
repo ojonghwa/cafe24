@@ -44,7 +44,7 @@ table {
 }
 table th, table td {
     font-size:14px;
-    padding:10px;
+    padding:6px;
     margin:0;
 }
 tbody tr:nth-child(odd) {
@@ -55,6 +55,7 @@ thead th, tbody tr.total {
     color:#fff;
     font-weight:bold;
 }
+
 
 table.cart {
     margin-bottom:40px;
@@ -69,7 +70,15 @@ tbody td.num {
 
 td input[type="submit"] {
     font-size:12px;
-    padding:4px 10px;
+    padding:4px 6px;
+}
+
+td div.post-date {
+    float: right;
+}
+
+td div.order-cost {
+    float: right;
 }
 
 form p label, form p input {

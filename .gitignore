@@ -4,3 +4,4 @@ __pycache__
 myshop.sqlite3
 requirements.txt
 settings.py
+iamport.py

@@ -100,13 +100,17 @@
                     {% if post.comment_set.count > 0 %}
                       <span class="text-danger small ml-2">{{ post.comment_set.count }}</span>
                     {% endif %}
+
+                    <div class="post-date text-secondary ml-2">
+                      {{ post.author.username }} &nbsp;&nbsp;&nbsp;
+                      {{ post.updated| date:'Y.m.d' }}
+                    </div>
                   </td>
-                  <td>{{ post.updated| date:'Y-m-d H:i' }}</td>
-                  <td>{{ post.author.username }}</td>
                 </tr>
+
                 <tr>
                   <td>&nbsp</td>
-                  <td colspan="3">{{ post.body|truncatewords:25 }}</td>
+                  <td>{{ post.body|truncatewords:25 }}</td>
                 </tr>
               {% endif %}
             {% endfor %}

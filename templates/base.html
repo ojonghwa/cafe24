@@ -55,16 +55,18 @@
                             <div class="dropdown-menu">
                                 <a class="dropdown-item navi-menu" href="{% url 'shop:customer_profile' %}">프로필</a>    
                                 <a class="dropdown-item navi-menu" href="{% url 'common:password_change' %}">비밀번호 변경</a>
-                                <div class="dropdown-divider"></div>
-                                <a class="dropdown-item navi-menu" href="{% url 'common:logout' %}">로그아웃</a>
+                                <!-- <div class="dropdown-divider"></div> -->
                             </div>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link navi-menu" href="{% url 'common:logout' %}">로그아웃</a>
                         </li>
                     {% else %}
                         <li class="nav-item">
-                            <a class="nav-link navi-menu" href="{% url 'common:login' %}">로그인</a>
+                            <a class="nav-link navi-menu" href="{% url 'common:signup' %}">회원가입</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link navi-menu" href="{% url 'common:signup' %}">회원가입</a>
+                            <a class="nav-link navi-menu" href="{% url 'common:login' %}">로그인</a>
                         </li>
                     {% endif %}
                 </ul>

@@ -16,9 +16,10 @@
         <th colspan="2" style="text-align: center;">상품</th>
         <th colspan="2" style="text-align: center;">수량</th>
         <th style="text-align: center;">단가</th>
-        <th style="text-align: center;">금액</th>
+        <!-- <th style="text-align: center;">금액</th> -->
       </tr>
     </thead>
+
     <tbody>
       {% for item in cart %}
         {% with product=item.product %}
@@ -32,6 +33,7 @@
                   {% endif %}">
               </a>
             </td>
+
             <td><a href="{{ product.get_absolute_url }}">
               {{ product.name|truncatechars:40 }}</a>
             </td>
@@ -40,6 +42,7 @@
               <form action="{% url 'cart:cart_add' product.id %}" method="post">
                 {{ item.update_quantity_form.quantity }}
                 {{ item.update_quantity_form.override }}
+                <!-- <input type="submit" class="btn btn-primary btn-sm" value="수정"> -->
                 <input type="submit" class="btn btn-primary btn-sm" value="수정">
                 {% csrf_token %}
               </form>
@@ -47,32 +50,34 @@
 
             <td>
               <form action="{% url 'cart:cart_remove' product.id %}" method="post">
+                <!-- <input type="submit" class="btn btn-primary btn-sm" value="삭제"> -->
                 <input type="submit" class="btn btn-primary btn-sm" value="삭제">
                 {% csrf_token %}
               </form>
             </td>
+
             <td class="num">{{ item.price|intcomma }}원</td>
-            <td class="num">{{ item.total_price|intcomma }}원</td>
+            <!-- <td class="num">{{ item.total_price|intcomma }}원</td> -->
           </tr>
         {% endwith %}
       {% endfor %}
 
       {% if cart.coupon %}
         <tr class="subtotal">
-          <td colspan="2"></td>
+          <td></td>
           <td colspan="2">합계</td>
           <td colspan="2" class="num">{{ cart.get_total_price|intcomma }}원</td>
         </tr>
 
         <tr>
-          <td colspan="2"></td>
+          <td></td>
           <td colspan="2" style="text-align: left;">쿠폰: {{ cart.coupon.code }} ({{ cart.coupon.discount }}% DC)</td>
           <td colspan="2" class="num neg"> -{{ cart.get_discount|floatformat:0|intcomma }}원</td>
         </tr>
       {% endif %}
 
       <tr class="total">
-        <td colspan="2"></td>
+        <td></td>
         <td colspan="2" style="text-align: right;">총 결재 금액</td>
         <td colspan="2" class="num">
           {{ cart.get_total_price_after_discount|floatformat:0|intcomma }}원
