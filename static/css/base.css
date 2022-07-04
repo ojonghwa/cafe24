@@ -77,10 +77,10 @@ td div.post-date {
     float: right;
 }
 
-td div.order-cost {
+td span.order-cost {
     float: right;
 }
-td div.order-item {
+td span.order-item {
     float: left;
 }
 
