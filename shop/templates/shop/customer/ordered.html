@@ -22,9 +22,11 @@
         <tbody>
             {% if order_list %}
                 <tr>
-                    <td>no.</td> <td>주문번호
+                    <td>no.</td> 
+                    <td><div class="order-item">주문번호</div>
                         <div class="order-cost">구매일시 &nbsp;&nbsp;&nbsp;&nbsp; 지급비용</div>
-                        <br>구매항목
+                        <br>
+                        <div class="order-item">구매항목</div>
                     </td>
                 </tr>
 
@@ -32,17 +34,20 @@
                     <tr>
                         <td>{{ order_list.paginator.count|sub:order_list.start_index|sub:forloop.counter0|add:1 }}</td>
 
-                        <td>{{ order.id }}
-
+                        <td>
+                            <div class="order-item">
+                                {{ order.id }}
+                            </div>
                             <div class="order-cost">
                                 {{ order.created| date:'Y.m.d H:i' }} &nbsp;&nbsp;&nbsp;&nbsp; 
                                 {{ order.get_total_cost|floatformat|intcomma }}원 <!-- 숫자 3자리 쉼표 표시-->
                             </div>
                             <br>
-
                             {% for item in order_items %}       <!-- 해당 order.id에 해당하는 구매항목들 추출 -->
                                 {% if item.order.id == order.id %}
-                                    <a href="{{ item.product.get_absolute_url }}">{{ item.product.name |truncatechars:25 }}</a>
+                                    <div class="order-item">
+                                        <a href="{{ item.product.get_absolute_url }}">{{ item.product.name |truncatechars:25 }}</a>
+                                    </div>
                                     <div class="order-cost text-secondary">
                                         [ {{ item.quantity }}개 x {{ item.price|intcomma }}원 ]
                                     </div>

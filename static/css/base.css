@@ -80,6 +80,9 @@ td div.post-date {
 td div.order-cost {
     float: right;
 }
+td div.order-item {
+    float: left;
+}
 
 form p label, form p input {
     float:left;
