@@ -46,7 +46,7 @@
                         {% for item in order_items %}       <!-- 해당 order.id에 해당하는 구매항목들 추출 -->
                             {% if item.order.id == order.id %}
                                 <span class="order-item">
-                                    <a href="{{ item.product.get_absolute_url }}">{{ item.product.name |truncatechars:25 }}</a>
+                                    <a href="{{ item.product.get_absolute_url }}">{{ item.product.name |truncatechars:22 }}</a>
                                 </span>
                                 <div class="order-cost text-secondary">
                                     [ {{ item.quantity }}개 x {{ item.price|intcomma }}원 ]
