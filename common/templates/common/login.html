@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block content %}
 <div class="container my-3">
@@ -7,6 +8,22 @@
     <div class="text-right">
         <span><a href="{% url 'common:password_reset' %}">비밀번호 초기화</a>, 
             또는 <a href="{% url 'common:signup' %}">회원 가입하세요.</a></span>
+    </div>
+    <br>
+    
+    <div class="social text-right">
+      <!-- <ul>
+        <li class="facebook">
+          <a href="{% url "social:begin" "facebook" %}">Sign in with Facebook</a>
+        </li>
+      </ul> -->
+      
+      <a href="{% url 'social:begin' 'facebook' %}">
+        <img src="{% static 'img/facebook login.png' %}" />
+      </a> <br/>
+      <a href="{% url 'social:begin' 'google-oauth2' %}">
+        <img src="{% static 'img/google login.png' %}" />
+      </a>
     </div>
  
     <form method="post" class="post-form" action="{% url 'common:login' %}">

@@ -41,7 +41,7 @@ class Product(models.Model):
     publisher = models.CharField(max_length=50, blank=True, default="PUBL")
     contributors = models.CharField(max_length=100, blank=True, default="CONT")
 
-    likers = models.ManyToManyField(User, through='Like', related_name='like_products')
+    likers = models.ManyToManyField(User, through='Like', related_name='like_products')     #symmetrical=False
 
     class Meta:
         ordering = ('name',)
@@ -52,6 +52,7 @@ class Product(models.Model):
 
     def get_absolute_url(self):
         return reverse('shop:product_detail', args=[self.id, self.slug])
+        #path('<int:id>/<slug:slug>/', views.product_detail, name='product_detail'),
 
 
 class Like(models.Model):

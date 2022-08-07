@@ -7,7 +7,7 @@ from .models import Post, Comment
 class PostAdmin(admin.ModelAdmin):
     search_fields = ['title', 'body']
     list_display = ['title', 'author', 'created', 'status']
-    list_filter =  ['title', 'author', 'created', 'status']
+    list_filter =  ['author', 'status']
 
     raw_id_fields = ['author']
     #date_hierarchy = 'publish'     #publish ; created -> invalid datetime value
@@ -16,9 +16,13 @@ class PostAdmin(admin.ModelAdmin):
 
 @admin.register(Comment)
 class CommentAdmin(admin.ModelAdmin):
-    search_fields = ['post', 'author']
-    list_display = ['post', 'author', 'content', 'created']
-    list_filter =  ['post', 'author', 'created']
+    search_fields = ['post', 'content']
+    list_display = ['post', 'author', 'short_content', 'created']
+    list_filter =  ['author']
 
     raw_id_fields = ['author']
     ordering = ['created', 'post', 'author']
+
+    def short_content(self, obj):
+        return "{}".format(obj.content[0:30])
+

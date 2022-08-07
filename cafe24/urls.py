@@ -17,7 +17,9 @@ urlpatterns = [
     path('payment/', include('payment.urls', namespace='payment')),
     path('coupons/', include('coupons.urls', namespace='coupons')),
     path('api/', include('api.urls', namespace='shop_api')),
+    path('social-auth/', include('social_django.urls', namespace='social')),		#facebook login
 ]
+
 
 handler404 = 'common.views.page_not_found'
 

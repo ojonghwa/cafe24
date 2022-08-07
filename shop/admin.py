@@ -11,12 +11,13 @@ class CategoryAdmin(admin.ModelAdmin):
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ['name', 'slug', 'price', 'available', 'publication_date', 'updated']
-    list_filter = ['name', 'available', 'publication_date', 'updated']
+    list_display = ['name', 'price', 'available', 'publication_date', 'updated']
+    #list_filter = ['name', 'available', 'publication_date', 'updated']
     list_editable = ['price', 'available']
     prepopulated_fields = {'slug': ('name',)}
     date_hierarchy = 'publication_date'
-    search_fields = ['name']
+    search_fields = ['name', 'slug']
+    ordering = ['-updated']
 
 
 @admin.register(Profile)
