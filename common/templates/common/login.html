@@ -12,17 +12,11 @@
     <br>
     
     <div class="social text-right">
-      <!-- <ul>
-        <li class="facebook">
-          <a href="{% url "social:begin" "facebook" %}">Sign in with Facebook</a>
-        </li>
-      </ul> -->
-      
       <a href="{% url 'social:begin' 'facebook' %}">
-        <img src="{% static 'img/facebook login.png' %}" />
-      </a> <br/>
+        <img src="{% static 'common/facebook login.png' %}" />
+      </a> <br class="margin" />
       <a href="{% url 'social:begin' 'google-oauth2' %}">
-        <img src="{% static 'img/google login.png' %}" />
+        <img src="{% static 'common/google login.png' %}"  vspace="5" />
       </a>
     </div>
  
