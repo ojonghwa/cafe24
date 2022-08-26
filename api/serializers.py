@@ -8,7 +8,7 @@ from django.contrib.auth.models import User
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'username', 'email']
+        fields = ['username', 'email']
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -18,6 +18,8 @@ class CategorySerializer(serializers.ModelSerializer):
         
 
 class ProductSerializer(serializers.ModelSerializer):
+    category = CategorySerializer(read_only=True)
+    likers  = serializers.StringRelatedField(many=True)
     class Meta:
         model = Product
         fields = ['id', 'name', 'slug', 'price', 'category', 'image', 'publication_date',  
@@ -53,6 +55,10 @@ class OrderSerializer(serializers.ModelSerializer):
 
 
 class PostSerializer(serializers.ModelSerializer):
+    author = UserSerializer(read_only=True)
+    product = ItemtSerializer(read_only=True)
+    voter  = serializers.StringRelatedField(many=True)
+
     class Meta:
         model = Post
-        fields = '__all__'
+        fields = ['id','title','body','product','author','created','status','voter']
