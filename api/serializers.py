@@ -87,3 +87,19 @@ class PostSerializer(serializers.ModelSerializer):
             "status",
             "voter",
         ]
+
+
+class SignupSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True)
+
+    def create(self, validated_date):  # POST
+        user = User.objects.create(
+            username=validated_date["username"], email=validated_date["email"]
+        )
+        user.set_password(validated_date["password"])  # 암호화해서 저장
+        user.save()
+        return user
+
+    class Meta:
+        model = User
+        fields = ["pk", "username", "password", "email"]

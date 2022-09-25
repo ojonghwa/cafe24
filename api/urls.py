@@ -19,6 +19,7 @@ router.register("order", views.OrderViewSet)
 urlpatterns = [
     path("", include(router.urls)),
     path("login/", views.Login.as_view(), name="login"),
+    path("signup/", views.Signup.as_view(), name="signup"),
     # path('category/', views.CategoryListView.as_view(), name='category_list'),
     # path('category/<pk>/', views.CategoryProductView.as_view(), name='product_list'),
     # path('product/<pk>/', views.ProductDetailView.as_view(), name='product_detail'),
