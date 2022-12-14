@@ -19,10 +19,10 @@ from rest_framework.permissions import (
 )
 from django.contrib.auth import authenticate
 from rest_framework.status import (
-    HTTP_404_NOT_FOUND,
-    HTTP_400_BAD_REQUEST,
     HTTP_200_OK,
     HTTP_201_CREATED,
+    HTTP_400_BAD_REQUEST,
+    HTTP_404_NOT_FOUND,
 )
 from rest_framework.authtoken.models import Token
 
@@ -52,7 +52,7 @@ from dateutil.relativedelta import relativedelta
 import json
 
 
-# curl -X GET http://127.0.0.1:8000/api/getWeatherData/Seoul/ -H "Authorization:Token *"
+# curl -X GET http://127.0.0.1:8000/api/getWeatherData/Seoul/ -H "Authorization:Token ***"
 
 
 class getWeatherData(APIView):
