@@ -61,6 +61,13 @@ def product_detail(request, id, slug):
             grade = like_product[0][0]
         else:
             grade = 0
+
+        # product.likers.all()
+        # user.like_products.all()
+
+        # print(product.likers.all(), file=sys.stdout)   #<QuerySet [<User: admin>, <User: ojonghwa>]>
+        # print(request.user.like_products.all(), file=sys.stdout)   #<QuerySet [<Product: 이한영의 Django(장고) 입문>]>
+
     else:
         grade = 0
 

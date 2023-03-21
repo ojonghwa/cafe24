@@ -5,7 +5,7 @@ from django.conf import settings
 from django.core.validators import MinValueValidator, MaxValueValidator
 from datetime import date
 from django.contrib.auth.models import User
- 
+
 
 class Category(models.Model):
     name = models.CharField(max_length=200, db_index=True)
@@ -46,9 +46,15 @@ class Product(models.Model):
     publisher = models.CharField(max_length=50, blank=True, default="PUBL")
     contributors = models.CharField(max_length=100, blank=True, default="CONT")
 
+    # 다대다관계 중개테이블 Like를 통해 별점 등의 정보를 추가하는게 가능
     likers = models.ManyToManyField(
         User, through="Like", related_name="like_products"
     )  # symmetrical=False
+
+    # product.likers.all()
+    # <QuerySet [<User: admin>, <User: ojonghwa>]>
+    # user.like_products.all()
+    # <QuerySet [<Product: 이한영의 Django(장고) 입문>]>
 
     class Meta:
         ordering = ("name",)
@@ -66,11 +72,15 @@ class Like(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     grade = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)])
-    # post1.likers.add(request.user ) 사용불가
-    # user1.likeposts.add(post1 )  사용불가
+
     # like_grade = Like.objects.create(user=user1, product=product1, grade=5)
     # product1.likers.all()
     # user1.like_products.all()
+
+    # if user1.like_products.filter(id=product1.id).exits():
+    #   user1.like_products.remove(product1)
+    # else:
+    #   user1.like_products.add(product1)
 
 
 class Profile(models.Model):
