@@ -1,5 +1,7 @@
 from rest_framework import routers
+from rest_framework_simplejwt.views import TokenRefreshView
 from django.urls import path, include
+from .views import MyTokenObtainPairView
 from . import views
 
 app_name = "shop_api"
@@ -20,6 +22,9 @@ urlpatterns = [
     path("", include(router.urls)),
     path("login/", views.Login.as_view(), name="login"),
     path("signup/", views.Signup.as_view(), name="signup"),
+    # JWT 인증
+    path("token/", MyTokenObtainPairView.as_view()),
+    path("token/refresh/", TokenRefreshView.as_view()),
     path(
         "orderitem/<pk>/", views.OrderItemDetailView.as_view(), name="orderitem_detail"
     ),

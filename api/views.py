@@ -14,7 +14,6 @@ from rest_framework.authentication import (
 from rest_framework.permissions import (
     IsAuthenticated,
     IsAdminUser,
-    IsAuthenticatedOrReadOnly,
     AllowAny,
 )
 from django.contrib.auth import authenticate
@@ -25,6 +24,8 @@ from rest_framework.status import (
     HTTP_404_NOT_FOUND,
 )
 from rest_framework.authtoken.models import Token
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from rest_framework_simplejwt.views import TokenObtainPairView
 
 from shop.models import Product, Category
 from blog.models import Post, Comment
@@ -55,8 +56,19 @@ import json
 # curl -X GET http://127.0.0.1:8000/api/getWeatherData/Seoul/ -H "Authorization:Token ***"
 
 
+class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
+    @classmethod
+    def get_token(cls, user):
+        token = super().get_token(user)
+        # token['username'] = user.username     #custom claims
+        return token
+
+
+class MyTokenObtainPairView(TokenObtainPairView):
+    serializer_class = MyTokenObtainPairSerializer
+
+
 class getWeatherData(APIView):
-    authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
     content = {}
 
@@ -137,7 +149,6 @@ class getWeatherData(APIView):
 
 
 class getDustData(APIView):
-    authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
     content = {}
 
@@ -376,7 +387,6 @@ def iot_esp8266(request, username):
 
 
 class iot_esp8266View(APIView):
-    authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
 
     def post(self, request, format=None):
@@ -394,29 +404,18 @@ class iot_esp8266View(APIView):
 
 
 class OrderViewSet(viewsets.ReadOnlyModelViewSet):
-    authentication_classes = [
-        TokenAuthentication,
-        BasicAuthentication,
-        SessionAuthentication,
-    ]
     permission_classes = [IsAdminUser]  # 관리자만 볼 수 있도록 제한
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
 
 
 class OrderItemDetailView(generics.RetrieveAPIView):
-    authentication_classes = [
-        TokenAuthentication,
-        BasicAuthentication,
-        SessionAuthentication,
-    ]
     permission_classes = [IsAdminUser]
     queryset = OrderItem.objects.all()
     serializer_class = OrderItemSerializer
 
 
 class OrderListDetailView(APIView):
-    authentication_classes = [TokenAuthentication, BasicAuthentication]
     permission_classes = [IsAdminUser]
 
     def get(self, request, username, format=None):
@@ -503,6 +502,7 @@ class PostViewSet(viewsets.ReadOnlyModelViewSet):
 
 class Login(APIView):
     def post(self, request):
+        # print("username: " + request.data.get("username"), file=sys.stdout)
         user = authenticate(
             username=request.data.get("username"), password=request.data.get("password")
         )
