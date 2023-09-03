@@ -1,0 +1,39 @@
+1. 파이썬 3.10 설치
+
+2. 비주얼스튜디오에서 cafe24 폴더 선택
+
+3. cafe24 폴더에서 
+c:\cafe24>python -m venv venv
+
+4. cafe24.cmd  
+venv\Scripts\activate
+
+5. (venv) C:\cafe24>pip install "Django==3.2.*" 
+
+6. (venv) C:\cafe24>python.exe -m pip install --upgrade pip
+
+7. GTK3 installer 설치 
+gtk3-runtime-3.24.31-2022-01-04-ts-win64
+
+
+8. 라이브러리 설치
+pip install pandas
+pip install mysqlclient
+pip install Pillow
+pip install djangorestframework
+pip install social-auth-app-django
+pip install django-cors-headers
+pip install braintree
+pip install weasyprint==53.*
+
+
+8. (venv) C:\cafe24>pip freeze > requirements.txt
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,73 @@
+{% extends "base.html" %}  
+{% load static %}
+{% load common_filter %}
+{% load humanize %}
+
+{% block title %}Profile{% endblock %}
+
+{% block content %}
+{% with post_list=order_list post=order %}
+<div class="container my-3">
+
+    <div class="col-12 text-right">
+        <span><a href="{% url 'shop:customer_profile_create' %}">배송주소 관리</a> 또는 
+            <a href="{% url 'shop:customer_profile' %}">작성글</a>
+        </span>
+    </div>
+
+
+    <h5 class="border-bottom py-3">구매목록</h5>
+    
+    <table class="table">
+        <tbody>
+            {% if order_list %}
+                <tr>
+                    <td>no.</td> 
+                    <td><span class="order-item">주문번호</span>
+                        <div class="order-cost">구매일시 &nbsp;&nbsp;&nbsp;&nbsp; 지급비용</div>
+                        <br>
+                        <span class="order-item">구매항목</span>
+                    </td>
+                </tr>
+
+                {% for order in order_list %}
+                <tr>
+                    <td>{{ order_list.paginator.count|sub:order_list.start_index|sub:forloop.counter0|add:1 }}</td>
+
+                    <td>
+                        <span class="order-item">
+                            {{ order.id }}
+                        </span>
+                        <div class="order-cost">
+                            {{ order.created| date:'Y.m.d H:i' }} &nbsp;&nbsp;&nbsp;&nbsp; 
+                            {{ order.get_total_cost|floatformat|intcomma }}원 <!-- 숫자 3자리 쉼표 표시-->
+                        </div>
+                        <br>
+                        {% for item in order_items %}       <!-- 해당 order.id에 해당하는 구매항목들 추출 -->
+                            {% if item.order.id == order.id %}
+                                <span class="order-item">
+                                    <a href="{{ item.product.get_absolute_url }}">{{ item.product.name |truncatechars:22 }}</a>
+                                </span>
+                                <div class="order-cost text-secondary">
+                                    {{ item.quantity }}개 x {{ item.price|intcomma }}원
+                                </div>
+                                <br/>
+                            {% endif %}
+                        {% endfor %}
+                    </td>
+                </tr>
+                {% endfor %}
+
+            {% else %}
+                <tr>
+                    <td colspan="3">아직 구매한 적이 없습니다.</td>
+                </tr>
+            {% endif %}
+        </tbody>
+    </table>
+
+    {% include "paginator.html" %}
+
+</div>
+{% endwith %}
+{% endblock %}

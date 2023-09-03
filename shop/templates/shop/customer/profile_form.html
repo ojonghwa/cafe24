@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}
+  배송주소 등록
+{% endblock %}
+
+{% block content %}
+<div class="container my-3">
+    <h5 class="border-bottom py-3">배송주소 등록</h5>
+
+    <form method="post" class="post-form my-3">
+      {% csrf_token %}
+
+      {% if profile %}
+        {% include "form_errors.html" %}
+
+        {%  for p in profile  %}
+
+          <div class="form-group">
+              <label for="fullname">이름:</label>
+              <input type="text" class="form-control" name="fullname" id="fullname"
+                    value="{{ p.fullname|default_if_none:'' }}">
+          </div>
+
+          <div class="form-group">
+              <label for="address">주소:</label>
+              <input type="text" class="form-control" name="address" id="address"
+                    value="{{ p.address|default_if_none:'' }}">
+          </div>
+
+          <div class="form-group">
+            <label for="postal_code">우편번호:</label>
+            <input type="text" class="form-control" name="postal_code" id="postal_code"
+                  value="{{ p.postal_code|default_if_none:'' }}">
+          </div>
+          
+          <div class="form-group">
+            <label for="mobile">전화번호:</label>
+            <input type="text" class="form-control" name="mobile" id="mobile"
+                  value="{{ p.mobile|default_if_none:'' }}">
+          </div>
+        {% endfor %}
+      {% else %}
+
+        {{ form.as_p }}
+      {% endif %}
+
+      <p><input type="submit" value="저장"></p>
+    </form>
+</div>
+{% endblock %}

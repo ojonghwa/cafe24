@@ -1,0 +1,168 @@
+{% extends "base.html" %}
+{% load static %}
+{% load humanize %}
+{% load common_filter %}
+
+
+{% block title %}
+  {{ product.name }}
+{% endblock %}
+
+{% block content %}
+  <div class="container product-detail my-3">
+    <img src="{% if product.image %}
+        {{ product.image.url }}
+      {% else %}
+        {% static 'img/no_image.png' %}
+      {% endif %}">
+
+    <h1>{{ product.name }}</h1>
+    <h2>
+      <a href="{{ product.category.get_absolute_url }}">
+        {{ product.category }}
+      </a>
+    </h2>
+    <p class="price">{{ product.price|intcomma }}원</p> 
+
+    <form action="{% url 'cart:cart_add' product.id %}" method="post">
+      {{ cart_product_form }}
+      {% csrf_token %}
+      <button type="submit" class="btn btn-primary btn-sm">장바구니추가</button>
+    </form> <br/>
+
+    {{ product.contributors }}, {{ product.publisher }}, {{ product.publication_date }}
+    <br/><br/>
+    {{ product.description|linebreaks }}
+
+ 
+    {% if request.user.is_authenticated %}
+
+      {{ like_form.media }}
+      <form id="like_form">
+        {% csrf_token %}
+        <input type="hidden" name="user" value="{{ request.user }}">
+        <input type="hidden" name="product" value="{{ product.id }}">
+        <input type="rating" name="grade" required="" id="id_grade" min="0" max="5" value="{{ grade }}" step="1" style="display:none;">
+        <div id="star_id_grade" class="rateit rateit-bg" data-rateit-backingfld="#id_grade"></div> &nbsp;&nbsp;
+        <button type="submit" class="btn btn-primary btn-sm mb-2">평점주기</button>
+      </form>
+    {% endif %}
+
+    <h6>
+      <span class="badge badge-warning" id="like_grade">
+        {% if all_grade.grade__count > 0 %}
+          전체평점: &nbsp;{{ all_grade.grade__avg|floatformat:1 }} 
+          ({{ all_grade.grade__count }}명)
+        {% endif %}
+      </span>
+    </h6>
+
+    <br/><hr/>
+  </div>
+
+
+  <div class="d-flex justify-content-center">
+    <div class="container">
+
+      {% if recommended_products %}
+        <h6>이 상품을 구입하신 분들이 다음 상품도 구입하셨습니다.</h6>
+
+        <div id="main" class="product-list">
+            {% for product in recommended_products %}
+              <div class="item">
+                <a href="{{ product.get_absolute_url }}">
+                  <img src="{% if product.image %}
+                        {{ product.image.url }}
+                    {% else %}
+                        {% static 'img/no_image.png' %}
+                    {% endif %}"><br/>
+                  {{ product.name|truncatechars:30 }}
+                </a><br>
+                {{ product.price|intcomma }}원
+              </div>
+            {% endfor %}
+        </div>
+      {% endif %}
+
+    
+    <div class="product_blog">
+      <h5>마이리뷰</h5>
+    
+      <table class="table">
+        <tbody>
+          {% if post_list %}
+            {% for post in post_list %}
+              {% if post.status == 'published' %}
+                <tr>
+                  <td>{{ post_list.paginator.count|sub:post_list.start_index|sub:forloop.counter0|add:1 }}</td>
+                  <td>
+                    <a href="{% url 'blog:detail' post.id %}">{{ post.title }}</a>
+                    {% if post.comment_set.count > 0 %}
+                      <span class="text-danger small ml-2">{{ post.comment_set.count }}</span>
+                    {% endif %}
+
+                    <div class="post-date text-secondary ml-2">
+                      {{ post.author.username }} &nbsp;&nbsp;&nbsp;
+                      {{ post.updated| date:'Y.m.d' }}
+                    </div>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td>&nbsp</td>
+                  <td>{{ post.body|truncatewords:25 }}</td>
+                </tr>
+              {% endif %}
+            {% endfor %}
+          {% else %}
+            <tr>
+              <td colspan="4">본 상품에 대해 등록된 글이 없습니다.</td>
+            </tr>
+          {% endif %}
+        </tbody>
+      </table>
+
+      {% include "paginator.html" %}
+
+      <a href="{% url 'blog:post_create' product.id %}" class="btn btn-primary btn-sm">
+        글 등록
+      </a>
+      <br/><br/>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+
+{% block script %}
+<script>
+  // On submiting the form, send the POST ajax
+  // request to server and after successfull submission display the object.
+  $("#like_form").submit(function (e) {
+    // preventing from page reload and default actions
+    e.preventDefault();
+
+    // serialize the data for sending the form data.
+    var serializedData = $(this).serialize();
+
+    $.ajax({               // make POST ajax call
+      type: 'POST',
+      url: "{% url 'shop:product_like' product.id %}",    
+      data: serializedData,
+
+      success: function (response) {
+        var grade__avg = JSON.parse(response["grade__avg"]);
+        var grade__count = JSON.parse(response["grade__count"]);
+        //alert( JSON.parse(response["grade__avg"]) );
+        var string_grade = "전체평점: &nbsp;" + grade__avg.toFixed(1) + " (" + grade__count + "명)"
+
+        $("#like_grade").html(string_grade)
+      },
+      error: function (response) {    // alert the error if any error occured
+        alert(response["responseJSON"]["error"]);
+      }
+    })
+  })
+</script>
+{% endblock %}
+

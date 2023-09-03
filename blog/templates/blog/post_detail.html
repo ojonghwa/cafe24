@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container my-3">
+    <h5 class="border-bottom py-2">{{ post.title }}</h5>
+
+    <div class="card my-3">
+        <div class="card-body product-detail">
+            <div class="card-text">
+                <a href="{{ product.get_absolute_url }}" class="badge badge-primary p-2">
+                    책: {{ product.name }}
+                </a><br/><br/>
+                {{ post.body }}
+            </div>
+
+            <div class="d-flex justify-content-end">
+                <div class="badge badge-light p-2 text-left">
+                    <div class="mb-2">{{ post.author.username }}</div>
+                    <div>{{ post.updated| date:'Y.m.d H:i' }}</div>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-start">
+                {% if request.user == post.author %}
+                    <h6 class="like">
+                        <a href="{% url 'blog:post_modify' post.id  %}"
+                            class="btn btn-sm btn-outline-secondary">수정</a>&nbsp;
+                        <a href="{% url 'blog:post_delete' post.id  %}"
+                            class="btn btn-sm btn-outline-secondary">삭제</a>&nbsp;&nbsp;
+                        
+                        <a href="#" class="badge badge-secondary p-2">
+                            <span class="total_count">{{ post.voter.count }}</span>
+                            &nbsp; 추천</a>
+                    </h6>
+                {% else %}
+
+                    {% if request.user in post.voter.all %}
+                        <h6 class="cancel">
+                            <a href="#" data-id="{{ post.id }}" data-action="cancel" 
+                                class="like badge badge-primary p-2">
+                                <span class="total_count">{{ post.voter.count }}</span>&nbsp; 추천
+                            </a>
+                        </h6>
+                    {% else %}
+                        <h6 class="vote">
+                            <a href="#" data-id="{{ post.id }}" data-action="vote" 
+                                class="like badge badge-secondary p-2">
+                                <span class="total_count">{{ post.voter.count }}</span>&nbsp; 추천
+                            </a>
+                        </h6>
+                    {% endif %}
+
+                {% endif %}
+            </div>
+        </div>
+
+
+        <!-- 댓글 Start -->
+        <div>
+            <a href="{% url 'blog:comment_create' post.id  %}"
+               class="small px-4"><medium>댓글 추가 ..</medium></a>
+        </div>
+
+        {% if post.comment_set.count > 0 %}
+            <div class="mt-1">
+                {% for comment in post.comment_set.all %}
+                    <a name="comment_{{ comment.id }}"></a>     <!-- 댓글 앵커 엘리먼트 추가 -->
+                    <div class="comment py-1 text-muted">
+                        <span style="white-space: pre-line;">{{ comment.content }}</span>
+                        <span class="badge badge-light p-2">- {{ comment.author }}, {{ comment.updated| date:'Y.m.d H:i' }}
+                        </span>
+                        {% if request.user == comment.author %}
+                            <a href="{% url 'blog:comment_modify' comment.id  %}" class="small">수정</a>,
+                            <a href="{% url 'blog:comment_delete' comment.id  %}" class="small delete">삭제</a>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+        <!-- 댓글 End -->
+
+    </div>
+</div>
+{% endblock %}
+
+
+{% block domready %}
+    $('a.like').click(function(e) {     // AJAX
+        e.preventDefault();
+        $.post('{% url "blog:post_vote" post.id %}', 
+            { id: $(this).data('id'), action: $(this).data('action') },
+
+            function(data) {
+                if (data['status'] == 'ok') {
+                    var previous_action = $('a.like').data('action');
+
+                    // toggle data-action
+                    $('a.like').data('action', previous_action == 'vote' ? 'cancel' : 'vote');
+
+                    // update total likes
+                    var previous_likes = parseInt($('span.total_count').text());
+                    $('span.total_count').text(previous_action == 'vote' ? previous_likes + 1 : previous_likes - 1);
+
+                    if( $('a.like').hasClass('badge-secondary') ) {
+                        $('a.like').removeClass('badge-secondary');
+                        $('a.like').addClass('badge-primary');
+                    } else {
+                        $('a.like').removeClass('badge-primary');
+                        $('a.like').addClass('badge-secondary');
+                    }
+                }
+            }
+        );
+    });
+{% endblock %}

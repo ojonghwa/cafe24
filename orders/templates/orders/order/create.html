@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% load humanize %}
+
+{% block title %}배송정보{% endblock %}
+
+{% block content %}
+<div class="container my-3">
+  <h5 class="border-bottom py-3">배송정보</h5>
+
+  <div class="order-info">
+    <h4>주문내역</h4>
+    <ul>
+      {% for item in cart %}
+        <li>
+          {{ item.quantity }}권, {{ item.product.name }}  <div class="text-right">{{ item.total_price|intcomma }}원</div>
+        </li>
+      {% endfor %}
+
+      {% if cart.coupon %}
+        <li style="list-style: none; font-weight: bold;">
+          쿠폰: {{ cart.coupon.code }} ({{ cart.coupon.discount }}% DC)
+          <div class="neg text-right">- {{ cart.get_discount|floatformat:0|intcomma }}원</div>
+        </li>
+      {% endif %}
+    </ul>
+    
+    <hr/>
+    <p>합계: {{ cart.get_total_price_after_discount|floatformat:0|intcomma }}원</p>
+  </div>
+
+  <form method="post" class="order-form">
+    {% csrf_token %}
+    
+    {% if profile %}
+      {% include "form_errors.html" %}
+
+      {%  for p in profile  %}
+        <div class="form-group">
+            <label for="user">사용자 ID:</label>
+            <input type="text" class="form-control" name="user" id="user"
+                  value="{{ request.user.username|default_if_none:'' }}">
+        </div>
+        <div class="form-group">
+            <label for="fullname">이름:</label>
+            <input type="text" class="form-control" name="fullname" id="fullname"
+                  value="{{ p.fullname|default_if_none:'' }}">
+        </div>
+        <div class="form-group">
+          <label for="email">Email:</label>
+          <input type="text" class="form-control" name="email" id="email"
+                value="{{ request.user.email|default_if_none:'' }}">
+        </div>
+        <div class="form-group">
+            <label for="address">주소:</label>
+            <input type="text" class="form-control" name="address" id="address"
+                  value="{{ p.address|default_if_none:'' }}">
+        </div>
+        <div class="form-group">
+          <label for="postal_code">우편번호:</label>
+          <input type="text" class="form-control" name="postal_code" id="postal_code"
+                value="{{ p.postal_code|default_if_none:'' }}">
+        </div>
+        <div class="form-group">
+          <label for="mobile">전화번호:</label>
+          <input type="text" class="form-control" name="mobile" id="mobile"
+                value="{{ p.mobile|default_if_none:'' }}">
+        </div>
+      {% endfor %}
+      
+    {% else %}
+
+      {{ form.as_p }}
+    {% endif %}
+
+    <p><input type="submit" value="다음 단계"></p>
+  </form>
+</div>
+{% endblock %}
