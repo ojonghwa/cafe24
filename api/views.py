@@ -527,8 +527,8 @@ class Signup(CreateAPIView):
     permission_classes = [AllowAny]
 
 
-# C:\>curl -X POST http://kbeautymania.com/api/login/ -d "username=testuser1&password=********"
-# C:\>curl -X POST http://kbeautymania.com/api/signup/ -d "username=testuser1&password=********&email=test@naver.com"
+# C:\>curl -X POST http://kbeautymania.com/api/login/ -d "username=testuser1&password=*******"
+# C:\>curl -X POST http://kbeautymania.com/api/signup/ -d "username=testuser1&password=*******&email=test@naver.com"
 
 
 class UserViewSet(viewsets.ReadOnlyModelViewSet):
