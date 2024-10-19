@@ -5,3 +5,6 @@ myshop.sqlite3
 requirements.txt
 settings.py
 iamport.py
+venv
+cafe24.cmd
+.gitignore
