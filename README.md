@@ -16,3 +16,5 @@ pip install mysqlclient
 pip install numpy
 pip install pandas
 pip install weasyprint	#추가적인 작업이 필요할 것
+
+settings.py 복사하기 
