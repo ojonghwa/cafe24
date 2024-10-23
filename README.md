@@ -9,12 +9,15 @@ cafe24/python -m venv venv
 
 pip install Django==4.2.*
 pip install braintree
-pip install djangorestframework, djangorestframework-simplejwt
+pip install djangorestframework
+pip install djangorestframework-simplejwt
 pip install social-auth-app-django
-pip install django-cors-headers
+pip install django-cors-headers 
+sudo apt install default-libmysqlclient-dev build-essential   #리눅스에서
 pip install mysqlclient
 pip install numpy
 pip install pandas
-pip install weasyprint	#추가적인 작업이 필요할 것
+pip install weasyprint	        #추가작업 필요할 수 있음 
+sudo apt install fonts-nanum    #리눅스에서 한글 글꼴 
 
 settings.py 복사하기 
