@@ -21,6 +21,7 @@ pip install weasyprint	        #추가작업 필요할 수 있음
 sudo apt install fonts-nanum    #리눅스에서 한글 글꼴 
 
 settings.py 복사하기 
+myshop.sqlite3 복사하기 
 
 python manage.py runserver 0.0.0.0:8000    #외부접속 허용하기 위함
 
@@ -32,5 +33,7 @@ python manage.py createsuperuser
 python manage.py changepassword <유저이름>
 
 sudo apt-get update
+sudo apt-get upgrade
+
 sudo apt-get install sqlite3
 sqlite3 myshop.sqlite3
