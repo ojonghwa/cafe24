@@ -30,3 +30,7 @@ python manage.py createsuperuser
 
 #슈퍼유저 비밀번호 초기화, changepassword 명령어로 비밀번호 초기화
 python manage.py changepassword <유저이름>
+
+sudo apt-get update
+sudo apt-get install sqlite3
+sqlite3 myshop.sqlite3
