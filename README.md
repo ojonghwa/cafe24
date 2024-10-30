@@ -23,3 +23,9 @@ sudo apt install fonts-nanum    #리눅스에서 한글 글꼴
 settings.py 복사하기 
 
 python manage.py runserver 0.0.0.0:8000    #외부접속 허용하기 위함
+
+#슈퍼 유저 생성하기
+python manage.py createuser <유저이름> - Username, Email, Password 입력하여 슈퍼유저(어드민)을 생성
+
+#슈퍼 유저 비밀번호 초기화, 관리자 계정의 비밀번호를 잃어버린 경우 'changepassword' 명령어를 입력하여 비밀번호를 초기화
+python manage.py changepassword <유저이름> 
