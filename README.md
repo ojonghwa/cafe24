@@ -23,14 +23,18 @@ sudo apt install fonts-nanum    #리눅스에서 한글 글꼴
 settings.py 복사하기 
 myshop.sqlite3 복사하기 
 
-python manage.py runserver 0.0.0.0:8000    #외부접속 허용하기 위함
 
-#슈퍼 유저 생성하기
+#admin 계정생성
 python manage.py createsuperuser 
-- Username, Email, Password 입력하여 슈퍼유저(어드민) 생성
+- Username, Email, Password 입력
 
 #슈퍼유저 비밀번호 초기화, changepassword 명령어로 비밀번호 초기화
-python manage.py changepassword <유저이름>
+#python manage.py changepassword <유저이름>
+
+python manage.py makemigrations
+python manage.py migrate
+
+python manage.py runserver 0.0.0.0:8000    #외부접속 허용하기 위함
 
 sudo apt-get update
 sudo apt-get upgrade
