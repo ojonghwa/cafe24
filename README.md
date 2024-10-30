@@ -36,6 +36,9 @@ python manage.py migrate
 
 python manage.py runserver 0.0.0.0:8000    #외부접속 허용하기 위함
 
+#정식 서버에 설치할 경우,  "social_django",  # facebook & Google login, pip install social-auth-app-django
+#그렇지 않을 경우 social-auth, authtoken_token db 경고 무시할 것 
+
 sudo apt-get update
 sudo apt-get upgrade
 
