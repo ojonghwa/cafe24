@@ -17,7 +17,7 @@ sudo apt install default-libmysqlclient-dev build-essential   #리눅스에서
 pip install mysqlclient
 pip install numpy
 pip install pandas
-pip install weasyprint	        #추가작업 필요할 수 있음 
+pip install weasyprint	        #추가작업 필요할 수 있음, win 설치 - gtk3-runtime-3.24.29-2021-04-29-ts-win64.exe 
 sudo apt install fonts-nanum    #리눅스에서 한글 글꼴 
 
 settings.py 복사하기 
