@@ -1,5 +1,5 @@
-from django.contrib.auth import authenticate, login
-from django.shortcuts import render, redirect
+from django.contrib.auth import authenticate, login # type: ignore
+from django.shortcuts import render, redirect # type: ignore
 from .forms import UserForm
 
 
